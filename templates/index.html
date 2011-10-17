@@ -1,0 +1,408 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<title>Hacker News API</title> 
+	<link rel="stylesheet" href="/static/desktop.css" type="text/css"> 
+	<script type="text/javascript"> 
+		var port = (window.location.port != 80) ? ':' + window.location.port : '';
+		var apiURL = 'http://' + window.location.hostname + port;
+		
+		function getRss()
+		{
+			window.location = apiURL + '/rss/format/' + format('rss-format');
+		}
+		
+		function getNewsSimple()
+		{
+			window.location = apiURL + '/news';
+		}
+		
+		function getNewestSimple()
+		{
+			window.location = apiURL + '/newest';
+		}
+		
+		function getLatestSimple()
+		{
+			window.location = apiURL + '/latest';
+		}
+		
+		function getLatestAdvanced()
+		{
+			window.location = apiURL + '/latest/format/' + format('latest-format') + '/limit/' + elm('latest-limit')
+		}
+		
+		function getBestSimple()
+		{
+			window.location = apiURL + '/best';
+		}
+		
+		function getAskSimple()
+		{
+			window.location = apiURL + '/ask';
+		}
+		
+		function getNewsAdvanced()
+		{
+			window.location = apiURL + '/news/format/' + format('newsadvanced-format') + '/page/' + elm('newsadvanced-pageid')
+		}
+		
+		function getNewestAdvanced()
+		{
+			window.location = apiURL + '/newest/format/' + format('newestadvanced-format') + '/page/' + elm('newestadvanced-pageid')
+		}
+		
+		function getAskAdvanced()
+		{
+			window.location = apiURL + '/ask/format/' + format('ask-format') + '/page/' + elm('ask-pageid')
+		}
+		
+		function getBestAdvanced()
+		{
+			window.location = apiURL + '/best/format/' + format('best-format') + '/page/' + elm('best-pageid')
+		}
+		
+		function getByUser()
+		{
+			window.location = apiURL + '/submitted/format/' + format('user-format') + '/user/' + elm('user-pageid')
+		}
+		
+		function getComments()
+		{
+			window.location = apiURL + '/comments/format/' + format('comments-format') + '/id/' + elm('comments-pageid')
+		}
+		
+		function elm(id) { return (document.getElementById(id)) ? document.getElementById(id).value : '' }
+		function format(name) 
+		{ 
+			var elm = document.getElementsByName(name);
+			if (!elm)
+			{
+				return 'json';
+			}
+			for( i = 0; i < elm.length; i++)
+			{
+				if (elm[i].checked) return elm[i].value;
+			}
+			return 'json';
+		}
+		
+	</script> 
+</head> 
+<h1>Hacker News API (unofficial)</h2>
+<body id="userportal"> 
+	<div id="main-container"> 
+		<div id="app-header"> 
+			<h3>Last updated: {{last_updated}}</h3>
+			<span>The API is currently in beta and was developed for the <a href="https://market.android.com/details?id=com.glebpopov.hackernews" target="_new">Hacker News Droid</a> app. The API is built in Python and hosted on AppEngine. I used the <a href="http://www.crummy.com/software/BeautifulSoup/">Beautiful Soup</a> library for HTML parsing/scraping.
+				<br/>
+				<br/>
+			 There's five minute caching for main content entry points (/news, /best, /ask, /newest); there's no caching for paginated content (requests that require pageID).
+			<br/><br/>
+			<a href="https://github.com/glebpopov/Hacker-News-Droid-API">Full source code available on GitHub</a>.
+			 For any questions please drop me a note (<script type='text/javascript'>var a='@',g='gmail',c='.',d='com';document.writeln('g' + 'p' + 'o' + 'p' + 'o' + 'v' + a + g + c + d )</script>).
+				Cheers, <a href="http://glebche.appspot.com" target="_new">Gleb Popov</a>
+				</span> 
+		</div> 
+		<p>
+<b>API Index</b>:
+<ul>
+	<li><a href='#homepage'>Homepage</a></li>
+	<li><a href='#latest'>Latest</a></li>
+	<li><a href='#newest'>Newest</a></li>
+	<li><a href='#best'>Best</a></li>
+	<li><a href='#ask'>Ask</a></li>
+	<li><a href='#user'>Submitted</a></li>
+	<li><a href='#user'>Comments</a></li>
+</ul>		
+	</p>
+<hr >
+<a name="homepage"></a>
+<h2>Homepage: Simple API</h2> 
+<fieldset> 
+		<b>Returns homepage news, including author, points, number of comments, etc </b>&nbsp;<small>(JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/news</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getNewsSimple()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset> 
+
+<h2>Homepage: Advanced API</h2> 
+<fieldset> 
+		<b>Returns homepage news, including author, points, number of comments, etc </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/news/format/<em>&lt;format&gt;</em>/page/<em>&lt;page id&gt;</em></td> 
+        </tr> 
+		<tr> 
+         <td>Page ID:</td> 
+         <td><input type="text" id="newsadvanced-pageid" name="newsadvanced-pageid" />&nbsp;<small>(e.g. OTXxTSKeac)</small></td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="newsadvanced-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="newsadvanced-format" value="xml"/>XML</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getNewsAdvanced()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+
+<hr >
+<a name="latest"></a>
+<h2>Latest: Simple API</h2> 
+<fieldset> 
+		<b>Returns a single top news story from homepage, including author, points, number of comments, etc </b>&nbsp;<small>(JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/latest</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getLatestSimple()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset> 
+
+<h2>Latest: Advanced API</h2> 
+<fieldset> 
+		<b>Returns multiple news stories based on the limit parameter, including author, points, number of comments, etc </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/latest/format/<em>&lt;format&gt;</em>/limit/<em>&lt;limit&gt;</em></td> 
+        </tr> 
+		<tr> 
+         <td>Limit:</td> 
+         <td><input type="text" id="latest-limit" name="latest-limit" value="1" />&nbsp;<small>(number of stories to return, e.g. 1)</small></td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="latest-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="latest-format" value="xml"/>XML</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getLatestAdvanced()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+
+<hr >
+<a name="newest"></a>
+<h2>Newest: Simple API</h2> 
+<fieldset> 
+		<b>Returns new posts, including author, points, number of comments, etc </b>&nbsp;<small>(JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/newest</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getNewestSimple()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset> 
+
+<h2>Newest: Advanced API</h2> 
+<fieldset> 
+		<b>Returns new posts, including author, points, number of comments, etc </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/newest/format/<em>&lt;format&gt;</em>/page/<em>&lt;page id&gt;</em></td> 
+        </tr> 
+		<tr> 
+         <td>Page ID:</td> 
+         <td><input type="text" id="newestadvanced-pageid" name="newestadvanced-pageid" />&nbsp;<small>(e.g. OTXxTSKeac)</small></td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="newestadvanced-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="newestadvanced-format" value="xml"/>XML</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getNewestAdvanced()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+
+<hr >
+<a name="best"></a>
+<h2>Best: Simple API</h2> 
+<fieldset> 
+		<b>Returns best content, including author, points, number of comments, etc </b>&nbsp;<small>(JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/best</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getBestSimple()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset> 
+
+<h2>Best: Advanced API</h2> 
+<fieldset> 
+		<b>Returns best content, including author, points, number of comments, etc </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/best/format/<em>&lt;format&gt;</em>/page/<em>&lt;page id&gt;</em></td> 
+        </tr> 
+		<tr> 
+         <td>Page ID:</td> 
+         <td><input type="text" id="best-pageid" name="best-pageid" />&nbsp;<small>(e.g. OTXxTSKeac)</small></td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="best-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="best-format" value="xml"/>XML</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getBestAdvanced()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+
+<hr >
+<a name="ask"></a>
+<h2>Ask: Simple API</h2> 
+<fieldset> 
+		<b>Returns ask HN content, including author, points, number of comments, etc </b>&nbsp;<small>(JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/ask</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getAskSimple()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+<h2>Ask HN: Advanced API</h2> 
+<fieldset> 
+		<b>Returns ask HN content, including author, points, number of comments, etc </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/ask/format/<em>&lt;format&gt;</em>/page/<em>&lt;page id&gt;</em></td> 
+        </tr> 
+		<tr> 
+         <td>Page ID:</td> 
+         <td><input type="text" id="ask-pageid" name="ask-pageid" />&nbsp;<small>(e.g. OTXxTSKeac)</small></td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="ask-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="ask-format" value="xml"/>XML</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getAskAdvanced()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+<!--
+<h2>RSS</h2> 
+<fieldset> 
+		<b>Returns Hacker News RSS feed formatted in XML or JSON</b>&nbsp;<small>(JSON or XML)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/rss</td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="rss-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="rss-format" value="xml"/>XML</td> 
+        </tr>
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getRss()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+-->
+<hr >
+<a name="user"></a>
+<h2>Submissions by User</h2> 
+<fieldset> 
+		<b>Returns submissions by user, including author, points, number of comments, etc </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/submitted/format/<em>&lt;format&gt;</em>/user/<em>&lt;username&gt;</em></td> 
+        </tr> 
+		<tr> 
+         <td>Username:</td> 
+         <td><input type="text" id="user-pageid" name="user-pageid" />&nbsp;<small>(e.g. john1)</small></td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="user-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="user-format" value="xml"/>XML</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getByUser()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+<hr >
+<a name="comments"></a>
+<h2>Comments by Story ID</h2> 
+<fieldset> 
+		<b>Returns story comments by id </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/comments/format/<em>&lt;format&gt;</em>/id/<em>&lt;id&gt;</em></td> 
+        </tr> 
+		<tr> 
+         <td>Story Id:</td> 
+         <td><input type="text" id="comments-pageid" name="comments-pageid" />&nbsp;<small>(e.g. 3423232)</small></td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="comments-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="comments-format" value="xml"/>XML</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getComments()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+ 
+</form> 
+</div>	
+<hr /> 
+<p>
+	Built by <a href="http://glebche.appspot.com">Gleb Popov</a>. Last updated: {{last_updated}}.
+	</p>
+<script type="text/javascript"> 
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24252811-3']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body> 
+</html>
