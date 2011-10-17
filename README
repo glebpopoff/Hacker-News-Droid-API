@@ -1,6 +1,6 @@
 Unofficial Hacker News API: http://hndroidapi.appspot.com
 
-The API is currently in beta and was developed for the Hacker News Droid app. The API is built in Python and hosted on AppEngine. I used the Beautiful Soup library for HTML parsing/scraping. 
+The API is currently in beta and was developed for the Hacker News Droid app (https://market.android.com/details?id=com.glebpopov.hackernews). The API is built in Python and hosted on AppEngine. I used the Beautiful Soup library for HTML parsing/scraping. 
 
 There's five minute caching for main content entry points (/news, /best, /ask, /newest); there's no caching for paginated content (requests that require pageID). 
 
