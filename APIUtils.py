@@ -129,6 +129,27 @@ def getHackerNewsNewestContent(page='', format='json', url='', referer='', remot
 				logging.warning('getCache: unable to retrieve data for id %s' % id)
 				return ''
 
+
+#get homepage second page stories
+def getHackerNewsSecondPageContent(page='', format='json', url='', referer='', remote_addr=''):
+	#only cache homepage data
+	if (page):
+		return parsePageContent(AppConfig.hackerNewsPage2URL, '/news', page,format)
+	else:
+		id = '/news2'
+		cachedData = getCache(id,format)
+		if (cachedData):
+			return cachedData
+		else:
+			hnData = parsePageContent(AppConfig.hackerNewsPage2URL, '/news', page,format)
+			if (hnData):
+				logging.debug('getCache: storing cached value for id %s' % id)
+				DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
+				return hnData
+			else:
+				logging.warning('getCache: unable to retrieve data for id %s' % id)
+				return ''
+								
 #get latest homepage stories
 def getHackerNewsLatestContent(page='', format='json', url='', referer='', remote_addr='', limit=1):
 	#only cache homepage data
@@ -275,10 +296,13 @@ def parsePageContent(hnAPIUrl, apiURL, page='',format='json',limit=0):
 					#need this for formatting
 					itemInfo = 'n/a '
 				
-				#last record
-				if (title.lower() == 'more' and '/x?fnid' in url):
+				#last record (either news2 or x?fnid)
+				if (title.lower() == 'more' or '/x?fnid' in url):
 					title = 'NextId'
-					url = '%s/format/%s/page/%s' % (apiURL, format, url.replace('/x?fnid=', ''))
+					if ('/x?fnid' in url):
+						url = '%s/format/%s/page/%s' % (apiURL, format, url.replace('/x?fnid=', ''))
+					else:
+						url = '/news2'
 					itemInfo = 'hn next id %s ' % tupURL[0]
 				
 				if (format == 'json'):

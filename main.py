@@ -8,6 +8,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
 from GetHNRSSHandler import HackerNewsRSSHandler
+from GetHNSecondPageHandler import HackerNewsSecondPageHandler
 from GetHNPageContentHandler import HackerNewsPageHandler
 from GetHNNewestHandler import HackerNewsNewestHandler
 from GetHNBestHandler import HackerNewsBestHandler
@@ -31,6 +32,7 @@ def main():
 										 ('/latest', HackerNewsLatestPageHandler),
 										 ('/latest/format/(json|xml)/limit/(.*)', HackerNewsLatestPageHandler),
 										 ('/news', HackerNewsPageHandler),
+										 ('/news2', HackerNewsSecondPageHandler),
 										 ('/news/format/(json|xml)', HackerNewsPageHandler),
 										 (r'/news/format/(json|xml)/page/(.*)', HackerNewsPageHandler),
 										 ('/newest', HackerNewsNewestHandler),
