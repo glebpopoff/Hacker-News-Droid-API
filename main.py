@@ -15,6 +15,7 @@ from GetHNBestHandler import HackerNewsBestHandler
 from GetHNAskHandler import HackerNewsAskHandler
 from GetHNSubmittedHandler import HackerNewsSubmittedHandler
 from GetHNCommentsHandler import HackerNewsCommentsHandler
+from GetHNNestedCommentsHandler import HackerNewsNestedCommentsHandler
 from GetHNLatestHandler import HackerNewsLatestPageHandler
 
 class MainHandler(webapp.RequestHandler):
@@ -45,7 +46,8 @@ def main():
 										 ('/ask/format/(json|xml)', HackerNewsAskHandler),
 										 (r'/ask/format/(json|xml)/page/(.*)', HackerNewsAskHandler),
 										 (r'/submitted/format/(json|xml)/user/(.*)', HackerNewsSubmittedHandler),
-										 (r'/comments/format/(json|xml)/id/(.*)', HackerNewsCommentsHandler)
+										 (r'/comments/format/(json|xml)/id/(.*)', HackerNewsCommentsHandler),
+										 (r'/nestedcomments/format/(json|xml)/id/(.*)', HackerNewsNestedCommentsHandler)
 										],
                                          debug=True)
     util.run_wsgi_app(application)

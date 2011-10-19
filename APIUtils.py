@@ -69,6 +69,24 @@ def getHackerNewsComments(articleId, format='json', url='', referer='', remote_a
 			logging.warning('getHackerNewsComments: unable to retrieve data for id %s' % id)
 			return ''	
 
+#parse HN's comments by story id
+def getHackerNewsNestedComments(articleId, format='json', url='', referer='', remote_addr=''):
+	#only cache homepage data
+	apiURL = "%s/item?id=%s" % (AppConfig.hackerNewsURL, articleId)
+	id = '/comments/%s' % (articleId)
+	cachedData = getCache(id,format)
+	if (cachedData):
+		return cachedData
+	else:
+		hnData = parseCommentsContent(apiURL, '/comments', None,format)
+		if (hnData):
+			logging.debug('getHackerNewsComments: storing cached value for id %s' % id)
+			DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
+			return hnData
+		else:
+			logging.warning('getHackerNewsComments: unable to retrieve data for id %s' % id)
+			return ''	
+
 #parse HN's ask content
 def getHackerNewsAskContent(page='', format='json', url='', referer='', remote_addr=''):
 	#only cache homepage data
@@ -387,6 +405,105 @@ def getParagraphCommentSiblings(node):
 
 #parse comments using Beautiful Soup
 def parseCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
+	returnData = MutableString()
+	returnData = ''
+	logging.debug('HN URL: %s' % hnAPIUrl)
+
+	result = getRemoteData(hnAPIUrl)
+	if (result):
+		htmlData = result.content	
+		soup = BeautifulSoup(htmlData)
+		urlLinksContent = soup('table')
+		counter = 0
+		comment_container = {}
+		for node in urlLinksContent:
+			commentTd = node.first('td', {'class' : 'default'})
+			if (commentTd):
+				authorSpan = commentTd.first('span', {'class' : 'comhead'})
+				#multi-paragraph comments are a bit tricky, parser wont' retrieve them using "span class:comment" selector
+				commentSpan = getParagraphCommentSiblings(commentTd.first('span', {'class' : 'comment'}))
+				replyLink = commentTd.first('a', {'href' : re.compile('^reply.*')})['href']
+				if (replyLink and "reply?id=" in replyLink):
+					replyLink = replyLink.replace('reply?id=', '')
+				if (authorSpan and commentSpan):
+					#author span: <span class="comhead"><a href="user?id=dendory">dendory</a> 1 day ago  | <a href="item?id=3015166">link</a></span>
+					commentId = authorSpan.first('a', {'href' : re.compile('^item.*')})
+					user = authorSpan.first('a', {'href' : re.compile('^user.*')})
+					#get time posted...lame but works. for some reason authorSpan.string returns NULL
+					timePosted = str(authorSpan).replace('<span class="comhead">', '').replace('</span>', '')
+					#now replace commentId and user blocks
+					timePosted = timePosted.replace(str(user), '').replace('| ', '').replace(str(commentId), '')
+					if (commentId['href'] and "item?id=" in commentId['href']):
+						commentId = commentId['href'].replace('item?id=', '')
+					#cleanup
+					commentString = removeHtmlTags(str(commentSpan))
+					if ('__BR__reply' in commentString):
+						commentString = commentString.replace('__BR__reply', '')
+					comment_container[counter] = [commentId, user.string, timePosted.strip(), commentString, replyLink]
+					counter = counter + 1
+			
+		#build up string	
+		commentKeyContainer = {}	
+		for key in comment_container.keys():
+			listCommentData = comment_container[key]
+			if (listCommentData and not commentKeyContainer.has_key(listCommentData[0])):
+				commentId = listCommentData[0]
+				if (commentId):
+					commentKeyContainer[commentId] = 1
+				userName = listCommentData[1]
+				whenPosted = listCommentData[2]
+				commentsString = listCommentData[3]
+				replyId = listCommentData[4]
+				
+				if (format == 'json'):
+					startTag = '{'
+					endTag = '},'
+
+					#cleanup
+					if (commentsString):
+						commentsString = re.sub("\"", "\\\"", commentsString)
+						commentsString = re.sub("\n", "", commentsString)
+						commentsString = re.sub("\t", " ", commentsString)
+						commentsString = re.sub("\r", "", commentsString)
+
+					if (len(commentsString) > 0):
+						commentsString = Formatter.data(format, 'comment', escape(removeNonAscii(commentsString)))[:-1]
+					else:
+						commentsString = "n/a "
+				else:
+					startTag = '<record>'
+					endTag = '</record>'
+					if (len(userName) > 0):
+						userName = escape(removeNonAscii(userName))
+
+					if (len(whenPosted) > 0):
+						whenPosted = escape(whenPosted)
+
+					if (len(commentsString) > 0):
+						commentsString = Formatter.data(format, 'comment', escape(removeNonAscii(commentsString)))								
+
+				if (commentId and userName and whenPosted and replyId and commentsString):
+					if (len(commentId) > 0):
+						returnData += startTag + Formatter.data(format, 'id', commentId)
+							
+					if (len(userName) > 0):
+						returnData += Formatter.data(format, 'username', userName)
+
+					if (len(whenPosted) > 0):
+						returnData += Formatter.data(format, 'time', whenPosted)
+
+					if (len(replyId) > 0):
+						returnData += Formatter.data(format, 'reply_id', escape(replyId))
+
+					if (len(commentsString) > 0 ):
+						returnData += commentsString + endTag
+	else:
+		returnData = None
+
+	return returnData
+
+#parse comments using Beautiful Soup
+def parseNestedCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
 	returnData = MutableString()
 	returnData = ''
 	logging.debug('HN URL: %s' % hnAPIUrl)
