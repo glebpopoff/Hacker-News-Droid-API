@@ -20,14 +20,15 @@ import GAHelper
 from xml.sax.saxutils import escape
 import APIUtils
 import GAHelper
+from google.appengine.api import urlfetch
 
 class HackerNewsSecondPageHandler(webapp.RequestHandler):
 	
 	#controller main entry		
 	def get(self,format='json',page=''):
+		
 		#set content-type
 		self.response.headers['Content-Type'] = Formatter.contentType(format)
-		
 		referer = ''
 		if ('HTTP_REFERER' in os.environ):
 			referer = os.environ['HTTP_REFERER']
@@ -35,8 +36,8 @@ class HackerNewsSecondPageHandler(webapp.RequestHandler):
 		returnData = MutableString()
 		returnData = APIUtils.getHackerNewsSecondPageContent(page,format,self.request.url, referer, self.request.remote_addr)
 		if (not returnData or returnData == None or returnData == '' or returnData == 'None'):
-			#call the service again this time without the pageID
-			returnData = APIUtils.getHackerNewsPageContent('',format,self.request.url, referer, self.request.remote_addr)
+			#call the service again
+			returnData = APIUtils.getHackerNewsSecondPageContent(page,format,self.request.url, referer, self.request.remote_addr)
 			
 		#track this request
 		GAHelper.trackGARequests('/news2', self.request.remote_addr, referer)

@@ -37,12 +37,13 @@ def getCache(pageId,format):
 def getHackerNewsSubmittedContent(user, format='json', url='', referer='', remote_addr=''):
 	#only cache homepage data
 	apiURL = "%s/submitted?id=%s" % (AppConfig.hackerNewsURL, user)
+	apiURLBackup = "%s/submitted?id=%s" % (AppConfig.hackerNewsURLBackup, user)
 	id = '/submitted/%s' % (user)
 	cachedData = getCache(id,format)
 	if (cachedData):
 		return cachedData
 	else:
-		hnData = parsePageContent(apiURL, '/submitted', None,format)
+		hnData = parsePageContent(apiURL,apiURLBackup, '/submitted', None,format)
 		if (hnData):
 			logging.debug('getHackerNewsSubmittedContent: storing cached value for id %s' % id)
 			DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -55,12 +56,13 @@ def getHackerNewsSubmittedContent(user, format='json', url='', referer='', remot
 def getHackerNewsComments(articleId, format='json', url='', referer='', remote_addr=''):
 	#only cache homepage data
 	apiURL = "%s/item?id=%s" % (AppConfig.hackerNewsURL, articleId)
+	apiURLBackup = "%s/item?id=%s" % (AppConfig.hackerNewsURLBackup, articleId)
 	id = '/comments/%s' % (articleId)
 	cachedData = getCache(id,format)
 	if (cachedData):
 		return cachedData
 	else:
-		hnData = parseCommentsContent(apiURL, '/comments', None,format)
+		hnData = parseCommentsContent(apiURL, apiURLBackup, '/comments', None,format)
 		if (hnData):
 			logging.debug('getHackerNewsComments: storing cached value for id %s' % id)
 			DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -73,14 +75,14 @@ def getHackerNewsComments(articleId, format='json', url='', referer='', remote_a
 def getHackerNewsAskContent(page='', format='json', url='', referer='', remote_addr=''):
 	#only cache homepage data
 	if (page):
-		return parsePageContent(AppConfig.hackerNewsAskURL, '/ask', page,format)
+		return parsePageContent(AppConfig.hackerNewsAskURL, AppConfig.hackerNewsAskURLBackup, '/ask', page,format)
 	else:
 		id = '/ask/'
 		cachedData = getCache(id,format)
 		if (cachedData):
 			return cachedData
 		else:
-			hnData = parsePageContent(AppConfig.hackerNewsAskURL, '/ask', page,format)
+			hnData = parsePageContent(AppConfig.hackerNewsAskURL, AppConfig.hackerNewsAskURLBackup, '/ask', page,format)
 			if (hnData):
 				logging.debug('getCache: storing cached value for id %s' % id)
 				DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -93,14 +95,14 @@ def getHackerNewsAskContent(page='', format='json', url='', referer='', remote_a
 def getHackerNewsBestContent(page='', format='json', url='', referer='', remote_addr=''):
 	#only cache homepage data
 	if (page):
-		return parsePageContent(AppConfig.hackerNewsBestURL, '/best', page,format)
+		return parsePageContent(AppConfig.hackerNewsBestURL, AppConfig.hackerNewsBestURLBackup, '/best', page,format)
 	else:
 		id = '/best/'
 		cachedData = getCache(id,format)
 		if (cachedData):
 			return cachedData
 		else:
-			hnData = parsePageContent(AppConfig.hackerNewsBestURL, '/best', page,format)
+			hnData = parsePageContent(AppConfig.hackerNewsBestURL, AppConfig.hackerNewsBestURLBackup, '/best', page,format)
 			if (hnData):
 				logging.debug('getCache: storing cached value for id %s' % id)
 				DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -113,14 +115,14 @@ def getHackerNewsBestContent(page='', format='json', url='', referer='', remote_
 def getHackerNewsNewestContent(page='', format='json', url='', referer='', remote_addr=''):
 	#only cache homepage data
 	if (page):
-		return parsePageContent(AppConfig.hackerNewsNewestURL, '/newest', page,format)
+		return parsePageContent(AppConfig.hackerNewsNewestURL, AppConfig.hackerNewsNewestURLBackup,'/newest', page,format)
 	else:
 		id = '/newest/'
 		cachedData = getCache(id,format)
 		if (cachedData):
 			return cachedData
 		else:
-			hnData = parsePageContent(AppConfig.hackerNewsNewestURL, '/newest', page,format)
+			hnData = parsePageContent(AppConfig.hackerNewsNewestURL, AppConfig.hackerNewsNewestURLBackup,'/newest', page,format)
 			if (hnData):
 				logging.debug('getCache: storing cached value for id %s' % id)
 				DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -134,14 +136,14 @@ def getHackerNewsNewestContent(page='', format='json', url='', referer='', remot
 def getHackerNewsSecondPageContent(page='', format='json', url='', referer='', remote_addr=''):
 	#only cache homepage data
 	if (page):
-		return parsePageContent(AppConfig.hackerNewsPage2URL, '/news', page,format)
+		return parsePageContent(AppConfig.hackerNewsPage2URL, AppConfig.hackerNewsPage2URLBackup,'/news2', page,format)
 	else:
 		id = '/news2'
 		cachedData = getCache(id,format)
 		if (cachedData):
 			return cachedData
 		else:
-			hnData = parsePageContent(AppConfig.hackerNewsPage2URL, '/news', page,format)
+			hnData = parsePageContent(AppConfig.hackerNewsPage2URL, AppConfig.hackerNewsPage2URLBackup, '/news2', page,format)
 			if (hnData):
 				logging.debug('getCache: storing cached value for id %s' % id)
 				DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -155,14 +157,14 @@ def getHackerNewsLatestContent(page='', format='json', url='', referer='', remot
 	#only cache homepage data
 	limit = int(limit)
 	if (page):
-		return parsePageContent(AppConfig.hackerNewsURL, '/latest', page,format,limit)
+		return parsePageContent(AppConfig.hackerNewsURL, AppConfig.hackerNewsURLBackup, '/latest', page,format,limit)
 	else:
 		id = '/latest/%s' % limit
 		cachedData = getCache(id,format)
 		if (cachedData):
 			return cachedData
 		else:
-			hnData = parsePageContent(AppConfig.hackerNewsURL, '/latest', page,format,limit)
+			hnData = parsePageContent(AppConfig.hackerNewsURL,AppConfig.hackerNewsURLBackup,  '/latest', page,format,limit)
 			if (hnData):
 				logging.debug('getCache: storing cached value for id %s' % id)
 				DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -175,14 +177,14 @@ def getHackerNewsLatestContent(page='', format='json', url='', referer='', remot
 def getHackerNewsPageContent(page='', format='json', url='', referer='', remote_addr=''):
 	#only cache homepage data
 	if (page):
-		return parsePageContent(AppConfig.hackerNewsURL, '/news', page,format)
+		return parsePageContent(AppConfig.hackerNewsURL, AppConfig.hackerNewsURLBackup, '/news', page,format)
 	else:
 		id = '/news/'
 		cachedData = getCache(id,format)
 		if (cachedData):
 			return cachedData
 		else:
-			hnData = parsePageContent(AppConfig.hackerNewsURL, '/news', page,format)
+			hnData = parsePageContent(AppConfig.hackerNewsURL, AppConfig.hackerNewsURLBackup, '/news', page,format)
 			if (hnData):
 				logging.debug('getCache: storing cached value for id %s' % id)
 				DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -191,33 +193,54 @@ def getHackerNewsPageContent(page='', format='json', url='', referer='', remote_
 				logging.warning('getCache: unable to retrieve data for id %s' % id)
 				return ''
 
-#call remote server to get data. If failed (timeout), try again
-def getRemoteData(urlStr):
+#call remote server to get data. If failed (timeout), try again and again and again and again (4 attempts because urlfetch on the GAE f-ing sucks)
+def getRemoteData(urlStr, backupUrl):
+	#attempt #1
 	try:	
 		logging.debug('getRemoteData: Attempt #1: %s' % urlStr)
 		result = urlfetch.fetch(url=urlStr, deadline=30)
 		if result.status_code == 200:
 			return result
 		else:
-			logging.error('getRemoteData: unable to get remote data...Attempt #1')
-			return None
+			logging.error('getRemoteData: unable to get remote data...Attempt #1: %s' % urlStr)
+			raise Exception("getRemoteData: Attempt #1 failed")
 	except:
-		#lets try to resubmit the request
+		#attempt #2
 		try:
-			logging.debug('getRemoteData: First attempt failed... Attempt #2: %s' % urlStr)
-			result = urlfetch.fetch(url=urlStr, deadline=30)
+			logging.debug('getRemoteData: First attempt failed... Attempt #2(Backup URL): %s' % backupUrl)
+			result = urlfetch.fetch(url=backupUrl, deadline=30)
 			if result.status_code == 200:
 				return result
 			else:
 				logging.error('getRemoteData: unable to get remote data...Attempt #2')
-				return None
+				raise Exception("getRemoteData: Attempt #2 failed")
 		except:
-			logging.error('getRemoteData: unable to get remote data...Attempt #2')
-			return None
+			#attempt #3
+			try:
+				logging.debug('getRemoteData: First attempt failed... Attempt #3: %s' % urlStr)
+				result = urlfetch.fetch(url=urlStr, deadline=30)
+				if result.status_code == 200:
+					return result
+				else:
+					logging.error('getRemoteData: unable to get remote data...Attempt #3')
+					raise Exception("getRemoteData: Attempt #3 failed")
+			except:
+				#attempt #4
+				try:
+					logging.debug('getRemoteData: First attempt failed... Attempt #4 (Backup URL): %s' % backupUrl)
+					result = urlfetch.fetch(url=backupUrl, deadline=30)
+					if result.status_code == 200:
+						return result
+					else:
+						logging.error('getRemoteData: unable to get remote data...Attempt #4')
+						return None
+				except:
+					logging.error('getRemoteData: unable to get remote data...Attempt #4. Stack')
+					return None
 	return jsonData
 
 #parse content using Beautiful Soup
-def parsePageContent(hnAPIUrl, apiURL, page='',format='json',limit=0):
+def parsePageContent(hnAPIUrl,hnBackupAPIUrl, apiURL, page='',format='json',limit=0):
 	returnData = MutableString()
 	returnData = ''
 	logging.debug('HN URL: %s' % hnAPIUrl)
@@ -227,7 +250,7 @@ def parsePageContent(hnAPIUrl, apiURL, page='',format='json',limit=0):
 		hnAPIUrl = '%s/x?fnid=%s' % (AppConfig.hackerNewsURL, page)
 	
 	#call HN website to get data
-	result = getRemoteData(hnAPIUrl)
+	result = getRemoteData(hnAPIUrl,hnBackupAPIUrl)
 	if (result):
 		htmlData = result.content	
 		soup = BeautifulSoup(htmlData)
@@ -386,12 +409,12 @@ def getParagraphCommentSiblings(node):
 		return nodeText
 
 #parse comments using Beautiful Soup
-def parseCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
+def parseCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format='json'):
 	returnData = MutableString()
 	returnData = ''
 	logging.debug('HN URL: %s' % hnAPIUrl)
 
-	result = getRemoteData(hnAPIUrl)
+	result = getRemoteData(hnAPIUrl, hnAPIUrlBackup)
 	if (result):
 		htmlData = result.content	
 		soup = BeautifulSoup(htmlData)
