@@ -7,7 +7,7 @@ def error(format, msg):
 
 def dataWrapper(format, returnData):
 	if (format == 'json'):
-		return '{"items":[%s]}' % (returnData[:-1])
+		return '{"items":[%s]}' % returnData.lstrip('[').rstrip('],')
 	else:
 		return '<?xml version="1.0"?><root>%s</root>' % returnData
 

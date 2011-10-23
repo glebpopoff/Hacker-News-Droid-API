@@ -14,6 +14,10 @@ from google.appengine.api import urlfetch
 import DataCache
 from BeautifulSoup import BeautifulSoup
 
+from django.utils import simplejson
+from pprint import pprint
+# from structured import dict2xml
+
 def removeHtmlTags(data):
 	p = re.compile(r'<.*?>')
 	return p.sub('', data)
@@ -78,7 +82,7 @@ def getHackerNewsNestedComments(articleId, format='json', url='', referer='', re
 	if (cachedData):
 		return cachedData
 	else:
-		hnData = parseCommentsContent(apiURL, '/comments', None,format)
+		hnData = parseNestedCommentsContent(apiURL, '/comments', None,format)
 		if (hnData):
 			logging.debug('getHackerNewsComments: storing cached value for id %s' % id)
 			DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -504,8 +508,9 @@ def parseCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
 
 #parse comments using Beautiful Soup
 def parseNestedCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
-	returnData = MutableString()
-	returnData = ''
+	# returnData = MutableString()
+	# returnData = ''
+	returnData = None
 	logging.debug('HN URL: %s' % hnAPIUrl)
 
 	result = getRemoteData(hnAPIUrl)
@@ -518,6 +523,16 @@ def parseNestedCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
 		for node in urlLinksContent:
 			commentTd = node.first('td', {'class' : 'default'})
 			if (commentTd):
+				previousTds = commentTd.fetchPreviousSiblings('td')
+				# logging.error(previousTds)
+				# logging.error(int(previousTds[-1].first('img')['width'])/20)
+				nestLevel = int(previousTds[-1].first('img')['width'])/40
+				# if nestLevel == 0:
+					# comments.append(this)
+				# else:
+					# nestLevels[nestLevel - 1].children.append(this)
+				# nestLevels[nestLevel] = this
+
 				authorSpan = commentTd.first('span', {'class' : 'comhead'})
 				#multi-paragraph comments are a bit tricky, parser wont' retrieve them using "span class:comment" selector
 				commentSpan = getParagraphCommentSiblings(commentTd.first('span', {'class' : 'comment'}))
@@ -538,12 +553,22 @@ def parseNestedCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
 					commentString = removeHtmlTags(str(commentSpan))
 					if ('__BR__reply' in commentString):
 						commentString = commentString.replace('__BR__reply', '')
-					comment_container[counter] = [commentId, user.string, timePosted.strip(), commentString, replyLink]
+					comment_container[counter] =	[
+														commentId,
+														user.string,
+														timePosted.strip(),
+														commentString,
+														replyLink,
+														nestLevel
+													]
 					counter = counter + 1
 			
 		#build up string	
-		commentKeyContainer = {}	
+		commentKeyContainer = {}
+		nestLevels = []
+		comments = []
 		for key in comment_container.keys():
+			comment = {}
 			listCommentData = comment_container[key]
 			if (listCommentData and not commentKeyContainer.has_key(listCommentData[0])):
 				commentId = listCommentData[0]
@@ -553,10 +578,11 @@ def parseNestedCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
 				whenPosted = listCommentData[2]
 				commentsString = listCommentData[3]
 				replyId = listCommentData[4]
+				nestLevel = listCommentData[5]
 				
 				if (format == 'json'):
-					startTag = '{'
-					endTag = '},'
+					# startTag = '{'
+					# endTag = '},'
 
 					#cleanup
 					if (commentsString):
@@ -566,7 +592,8 @@ def parseNestedCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
 						commentsString = re.sub("\r", "", commentsString)
 
 					if (len(commentsString) > 0):
-						commentsString = Formatter.data(format, 'comment', escape(removeNonAscii(commentsString)))[:-1]
+						# commentsString = Formatter.data(format, 'comment', escape(removeNonAscii(commentsString)))[:-1]
+						commentsString = escape(removeNonAscii(commentsString))[:-1]
 					else:
 						commentsString = "n/a "
 				else:
@@ -579,27 +606,55 @@ def parseNestedCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
 						whenPosted = escape(whenPosted)
 
 					if (len(commentsString) > 0):
-						commentsString = Formatter.data(format, 'comment', escape(removeNonAscii(commentsString)))								
+						# commentsString = Formatter.data(format, 'comment', escape(removeNonAscii(commentsString)))
+						commentsString = escape(removeNonAscii(commentsString))
 
 				if (commentId and userName and whenPosted and replyId and commentsString):
 					if (len(commentId) > 0):
-						returnData += startTag + Formatter.data(format, 'id', commentId)
+						# returnData += startTag + Formatter.data(format, 'id', commentId)
+						comment['id'] = commentId
 							
 					if (len(userName) > 0):
-						returnData += Formatter.data(format, 'username', userName)
+						# returnData += Formatter.data(format, 'username', userName)
+						comment['username'] = userName
 
 					if (len(whenPosted) > 0):
-						returnData += Formatter.data(format, 'time', whenPosted)
+						# returnData += Formatter.data(format, 'time', whenPosted)
+						comment['time'] = whenPosted
 
 					if (len(replyId) > 0):
-						returnData += Formatter.data(format, 'reply_id', escape(replyId))
+						# returnData += Formatter.data(format, 'reply_id', escape(replyId))
+						comment['reply_id'] = escape(replyId)
 
 					if (len(commentsString) > 0 ):
-						returnData += commentsString + endTag
-	else:
-		returnData = None
+						comment['comment'] = commentsString
+						# returnData += commentsString + endTag
+					comment['children'] = []
 
-	return returnData
+					if nestLevel == 0:
+						comments.append(comment)
+					else:
+						logging.error(nestLevel - 1)
+						logging.error(nestLevels[nestLevel - 1])
+						nestLevels[nestLevel - 1]['children'].append(comment)
+					logging.error(nestLevel)
+					logging.error(nestLevels)
+					# nestLevels[nestLevel] = comment
+					nestLevels.insert(nestLevel, comment)
+
+					# comments.append(comment)
+	# else:
+		# returnData = None
+
+	if (format == 'json'):
+		returnData = simplejson.dumps(comments)
+	else:
+		# returnData = dict2xml(comments, listnames = {'children': 'record'})
+	# return returnData
+	return simplejson.dumps(comments)
+
+# def listWithDicts2xml(datalist, root, elementname, listnames):
+	# if datalist['children'] 
 
 #parse HN's RSS feed
 def getHackerNewsRSS(format='json'):
