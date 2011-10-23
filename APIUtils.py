@@ -77,12 +77,13 @@ def getHackerNewsComments(articleId, format='json', url='', referer='', remote_a
 def getHackerNewsNestedComments(articleId, format='json', url='', referer='', remote_addr=''):
 	#only cache homepage data
 	apiURL = "%s/item?id=%s" % (AppConfig.hackerNewsURL, articleId)
-	id = '/comments/%s' % (articleId)
+	apiURLBackup = "%s/item?id=%s" % (AppConfig.hackerNewsURLBackup, articleId)
+	id = '/nestedcomments/%s' % (articleId)
 	cachedData = getCache(id,format)
 	if (cachedData):
 		return cachedData
 	else:
-		hnData = parseNestedCommentsContent(apiURL, '/comments', None,format)
+		hnData = parseNestedCommentsContent(apiURL, hnAPIUrlBackup, '/nestedcomments', None,format)
 		if (hnData):
 			logging.debug('getHackerNewsComments: storing cached value for id %s' % id)
 			DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
@@ -528,11 +529,11 @@ def parseCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format='json'
 	return returnData
 
 #parse comments using Beautiful Soup
-def parseNestedCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
+def parseNestedCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format='json'):
 	returnData = None
 	logging.debug('HN URL: %s' % hnAPIUrl)
 
-	result = getRemoteData(hnAPIUrl)
+	result = getRemoteData(hnAPIUrl, hnAPIUrlBackup)
 	if (result):
 		htmlData = result.content	
 		soup = BeautifulSoup(htmlData)
