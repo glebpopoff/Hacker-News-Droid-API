@@ -9,7 +9,11 @@ def dataWrapper(format, returnData):
 	if (format == 'json'):
 		return '{"items":[%s]}' % returnData.lstrip('[').rstrip('],')
 	else:
-		return '<?xml version="1.0"?><root>%s</root>' % returnData
+		if (not returnData.startswith('<root>')):
+			returnData = '<root>' + returnData
+		if (not returnData.endswith('</root>')):
+			returnData += '</root>'
+		return '<?xml version="1.0"?>%s' % returnData
 
 def contentType(format):
 	if (format == 'json'):

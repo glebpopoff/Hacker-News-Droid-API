@@ -16,7 +16,8 @@ from BeautifulSoup import BeautifulSoup
 
 from django.utils import simplejson
 from pprint import pprint
-# from structured import dict2xml
+from structured import dict2xml
+from structured import list2xml
 
 def removeHtmlTags(data):
 	p = re.compile(r'<.*?>')
@@ -649,9 +650,11 @@ def parseNestedCommentsContent(hnAPIUrl, apiURL, page='',format='json'):
 	if (format == 'json'):
 		returnData = simplejson.dumps(comments)
 	else:
-		# returnData = dict2xml(comments, listnames = {'children': 'record'})
-	# return returnData
-	return simplejson.dumps(comments)
+		logging.error(returnData)
+		# returnData = dict2xml({'root': comments}, listnames = {'children': 'record'})
+		returnData = list2xml(comments, 'root', 'record', listnames = {'children': 'record'})
+	return returnData
+	# return simplejson.dumps(comments)
 
 # def listWithDicts2xml(datalist, root, elementname, listnames):
 	# if datalist['children'] 
