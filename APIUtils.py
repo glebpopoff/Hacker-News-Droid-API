@@ -83,7 +83,7 @@ def getHackerNewsNestedComments(articleId, format='json', url='', referer='', re
 	if (cachedData):
 		return cachedData
 	else:
-		hnData = parseNestedCommentsContent(apiURL, hnAPIUrlBackup, '/nestedcomments', None,format)
+		hnData = parseNestedCommentsContent(apiURL, apiURLBackup, '/nestedcomments', None,format)
 		if (hnData):
 			logging.debug('getHackerNewsComments: storing cached value for id %s' % id)
 			DataCache.putData(id, format,removeNonAscii(hnData), url, referer, remote_addr)
