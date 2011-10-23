@@ -35,7 +35,7 @@
 		
 		function getLatestAdvanced()
 		{
-			window.location = apiURL + '/latest/format/' + format('latest-format') + '/limit/' + elm('latest-limit')
+			window.location = apiURL + '/latest/format/' + format('latest-format') + '/limit/' + elm('latest-limit');
 		}
 		
 		function getBestSimple()
@@ -50,32 +50,37 @@
 		
 		function getNewsAdvanced()
 		{
-			window.location = apiURL + '/news/format/' + format('newsadvanced-format') + '/page/' + elm('newsadvanced-pageid')
+			window.location = apiURL + '/news/format/' + format('newsadvanced-format') + '/page/' + elm('newsadvanced-pageid');
 		}
 		
 		function getNewestAdvanced()
 		{
-			window.location = apiURL + '/newest/format/' + format('newestadvanced-format') + '/page/' + elm('newestadvanced-pageid')
+			window.location = apiURL + '/newest/format/' + format('newestadvanced-format') + '/page/' + elm('newestadvanced-pageid');
 		}
 		
 		function getAskAdvanced()
 		{
-			window.location = apiURL + '/ask/format/' + format('ask-format') + '/page/' + elm('ask-pageid')
+			window.location = apiURL + '/ask/format/' + format('ask-format') + '/page/' + elm('ask-pageid');
 		}
 		
 		function getBestAdvanced()
 		{
-			window.location = apiURL + '/best/format/' + format('best-format') + '/page/' + elm('best-pageid')
+			window.location = apiURL + '/best/format/' + format('best-format') + '/page/' + elm('best-pageid');
 		}
 		
 		function getByUser()
 		{
-			window.location = apiURL + '/submitted/format/' + format('user-format') + '/user/' + elm('user-pageid')
+			window.location = apiURL + '/submitted/format/' + format('user-format') + '/user/' + elm('user-pageid');
 		}
 		
 		function getComments()
 		{
-			window.location = apiURL + '/comments/format/' + format('comments-format') + '/id/' + elm('comments-pageid')
+			window.location = apiURL + '/comments/format/' + format('comments-format') + '/id/' + elm('comments-pageid');
+		}
+		
+		function getNestedComments()
+		{
+			window.location = apiURL + '/nestedcomments/format/' + format('nestedcomments-format') + '/id/' + elm('nestedcomments-pageid');
 		}
 		
 		function elm(id) { return (document.getElementById(id)) ? document.getElementById(id).value : '' }
@@ -101,7 +106,9 @@
 		<div id="app-header"> 
 			<h3>Last updated: {{last_updated}}</h3>
 			<p>
-			Update (10/22/11): <i>Thanks to my friend Eric I now have a dedicated server to handle API traffic. The API has been down for a few hours on Friday, October 21st because of GAE urlfetch (DownloadError: ApplicationError: 2) errors. Apparently, GAE started to deny requests to HN so the data had to be retrieved from another server. The API still runs on GAE but the data is being fetched from another server and then provided to GAE instances for processing.  </i>
+				<small>Update (10/23/11): The API now supports nested comments as a new API call (/nestedcomments) (thanks to Suan Aik Yeo). The old comments API (/comments) has been deprecated.</small>
+			<br/>
+			<small>Update (10/22/11): Thanks to my friend Eric I now have a dedicated server to handle API traffic. The API has been down for a few hours on Friday, October 21st because of GAE urlfetch (DownloadError: ApplicationError: 2) errors. Apparently, GAE started to deny requests to HN so the data had to be retrieved from another server. The API still runs on GAE but the data is being fetched from another server and then provided to GAE instances for processing.  </small>
 			</p>
 			<span>The API is currently in beta and was developed for the <a href="https://market.android.com/details?id=com.glebpopov.hackernews" target="_new">Hacker News Droid</a> app. The API is built in Python and hosted on AppEngine. I used the <a href="http://www.crummy.com/software/BeautifulSoup/">Beautiful Soup</a> library for HTML parsing/scraping and an external dedicated box (generously provided by <script>var user='kigath'; document.writeln('<a href="mailto:' + user + 'i' + '@' + 'g' + 'mai' + 'l.com">' + 'Eric Kigathi</a>')</script>) to retrieve content from HN so it can be processed by GAE instances and served up.
 				<br/>
@@ -118,12 +125,13 @@
 <ul>
 	<li><a href='#homepage'>Homepage</a></li>
 	<li><a href='#homepage2'>Homepage Page 2</a></li>
+	<li><a href='#comments'>Comments</a>&nbsp;<small>(deprecated)</small></li>
+	<li><a href='#nestedcomments'>Nested Comments</a></li>
 	<li><a href='#latest'>Latest</a></li>
 	<li><a href='#newest'>Newest</a></li>
 	<li><a href='#best'>Best</a></li>
 	<li><a href='#ask'>Ask</a></li>
 	<li><a href='#user'>Submitted</a></li>
-	<li><a href='#user'>Comments</a></li>
 </ul>		
 	</p>
 <hr >
@@ -176,6 +184,56 @@
         </tr> 
         <tr> 
         <td colspan='2'><input type="button" value=" Test " onclick="getNewsAdvanced()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+
+<hr >
+<a name="comments"></a>
+<h2>Comments by Story ID (Deprecated as of 10/23/11)</h2> 
+<fieldset> 
+		<b>Returns story comments by id </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/comments/format/<em>&lt;format&gt;</em>/id/<em>&lt;id&gt;</em></td> 
+        </tr> 
+		<tr> 
+         <td>Story Id:</td> 
+         <td><input type="text" id="comments-pageid" name="comments-pageid" />&nbsp;<small>(e.g. 3423232)</small></td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="comments-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="comments-format" value="xml"/>XML</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getComments()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
+
+<hr >
+<a name="nestedcomments"></a>
+<h2>Nested Comments by Story ID</h2> 
+<fieldset> 
+		<b>Returns nested story comments by id </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/nestedcomments/format/<em>&lt;format&gt;</em>/id/<em>&lt;id&gt;</em></td> 
+        </tr> 
+		<tr> 
+         <td>Story Id:</td> 
+         <td><input type="text" id="nestedcomments-pageid" name="nestedcomments-pageid" />&nbsp;<small>(e.g. 3423232)</small></td> 
+        </tr> 
+		<tr> 
+         <td>Format:</td> 
+         <td><input type="radio" name="nestedcomments-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="nestedcomments-format" value="xml"/>XML</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getNestedComments()" /></td> 
         </tr> 
         </table> 
         <br /> 
@@ -383,36 +441,13 @@
         </table> 
         <br /> 
 </fieldset>
-<hr >
-<a name="comments"></a>
-<h2>Comments by Story ID</h2> 
-<fieldset> 
-		<b>Returns story comments by id </b>&nbsp;<small>(returns XML or JSON)</small><br /><br /> 
-        <table> 
-        <tr> 
-         <td>URL:</td> 
-         <td>http://hndroidapi.appspot.com/comments/format/<em>&lt;format&gt;</em>/id/<em>&lt;id&gt;</em></td> 
-        </tr> 
-		<tr> 
-         <td>Story Id:</td> 
-         <td><input type="text" id="comments-pageid" name="comments-pageid" />&nbsp;<small>(e.g. 3423232)</small></td> 
-        </tr> 
-		<tr> 
-         <td>Format:</td> 
-         <td><input type="radio" name="comments-format" value="json" checked='checked'/>JSON&nbsp;<input type="radio" name="comments-format" value="xml"/>XML</td> 
-        </tr> 
-        <tr> 
-        <td colspan='2'><input type="button" value=" Test " onclick="getComments()" /></td> 
-        </tr> 
-        </table> 
-        <br /> 
-</fieldset>
+
  
 </form> 
 </div>	
 <hr /> 
 <p>
-	Built by <a href="http://glebche.appspot.com">Gleb Popov</a>. Last updated: {{last_updated}}.
+	<strong>Author</strong>: <a href="http://glebche.appspot.com">Gleb Popov</a>. <strong>Credits</strong>: Suan Aik Yeo (Nested Comments API), Eric Kigathi (backend server support). Last updated: {{last_updated}}.
 	</p>
 <script type="text/javascript"> 
 

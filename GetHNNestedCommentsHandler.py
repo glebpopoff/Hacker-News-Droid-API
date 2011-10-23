@@ -17,7 +17,7 @@ import Formatter
 import AppConfig
 import GAHelper
 from xml.sax.saxutils import escape
-import APIUtils
+import APIContent
 import GAHelper
 from BeautifulSoup import BeautifulSoup
 
@@ -32,8 +32,7 @@ class HackerNewsNestedCommentsHandler(webapp.RequestHandler):
 		if ('HTTP_REFERER' in os.environ):
 			referer = os.environ['HTTP_REFERER']
 		
-		returnData = MutableString()
-		returnData = APIUtils.getHackerNewsNestedComments(id,format,self.request.url, referer, self.request.remote_addr)
+		returnData = APIContent.getHackerNewsNestedComments(id,format,self.request.url, referer, self.request.remote_addr)
 			
 		#track this request
 		GAHelper.trackGARequests('/nestedcomments/%s' % (id), self.request.remote_addr, referer)

@@ -18,7 +18,7 @@ import Formatter
 import AppConfig
 import GAHelper
 from xml.sax.saxutils import escape
-import APIUtils
+import APIContent
 import GAHelper
 
 class HackerNewsPageHandler(webapp.RequestHandler):
@@ -32,11 +32,10 @@ class HackerNewsPageHandler(webapp.RequestHandler):
 		if ('HTTP_REFERER' in os.environ):
 			referer = os.environ['HTTP_REFERER']
 		
-		returnData = MutableString()
-		returnData = APIUtils.getHackerNewsPageContent(page,format,self.request.url, referer, self.request.remote_addr)
+		returnData = APIContent.getHackerNewsPageContent(page,format,self.request.url, referer, self.request.remote_addr)
 		if (not returnData or returnData == None or returnData == '' or returnData == 'None'):
 			#call the service again this time without the pageID
-			returnData = APIUtils.getHackerNewsPageContent('',format,self.request.url, referer, self.request.remote_addr)
+			returnData = APIContent.getHackerNewsPageContent('',format,self.request.url, referer, self.request.remote_addr)
 			
 		#track this request
 		GAHelper.trackGARequests('/news', self.request.remote_addr, referer)

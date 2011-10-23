@@ -18,7 +18,7 @@ import Formatter
 import AppConfig
 import GAHelper
 from xml.sax.saxutils import escape
-import APIUtils
+import APIContent
 import GAHelper
 from BeautifulSoup import BeautifulSoup
 
@@ -33,9 +33,8 @@ class HackerNewsCommentsHandler(webapp.RequestHandler):
 		if ('HTTP_REFERER' in os.environ):
 			referer = os.environ['HTTP_REFERER']
 		
-		returnData = MutableString()
-		returnData = APIUtils.getHackerNewsComments(id,format,self.request.url, referer, self.request.remote_addr)
-			
+		returnData = APIContent.getHackerNewsComments(id,format,self.request.url, referer, self.request.remote_addr)
+				
 		#track this request
 		GAHelper.trackGARequests('/comments/%s' % (id), self.request.remote_addr, referer)
 		

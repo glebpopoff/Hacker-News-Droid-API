@@ -18,7 +18,7 @@ import Formatter
 import AppConfig
 import GAHelper
 from xml.sax.saxutils import escape
-import APIUtils
+import APIContent
 import GAHelper
 from google.appengine.api import urlfetch
 
@@ -33,11 +33,10 @@ class HackerNewsSecondPageHandler(webapp.RequestHandler):
 		if ('HTTP_REFERER' in os.environ):
 			referer = os.environ['HTTP_REFERER']
 		
-		returnData = MutableString()
-		returnData = APIUtils.getHackerNewsSecondPageContent(page,format,self.request.url, referer, self.request.remote_addr)
+		returnData = APIContent.getHackerNewsSecondPageContent(page,format,self.request.url, referer, self.request.remote_addr)
 		if (not returnData or returnData == None or returnData == '' or returnData == 'None'):
 			#call the service again
-			returnData = APIUtils.getHackerNewsSecondPageContent(page,format,self.request.url, referer, self.request.remote_addr)
+			returnData = APIContent.getHackerNewsSecondPageContent(page,format,self.request.url, referer, self.request.remote_addr)
 			
 		#track this request
 		GAHelper.trackGARequests('/news2', self.request.remote_addr, referer)

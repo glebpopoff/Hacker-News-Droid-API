@@ -18,7 +18,7 @@ import Formatter
 import AppConfig
 import GAHelper
 from xml.sax.saxutils import escape
-import APIUtils
+import APIContent
 import GAHelper
 
 class HackerNewsSubmittedHandler(webapp.RequestHandler):
@@ -31,8 +31,7 @@ class HackerNewsSubmittedHandler(webapp.RequestHandler):
 		if ('HTTP_REFERER' in os.environ):
 			referer = os.environ['HTTP_REFERER']
 		
-		returnData = MutableString()
-		returnData = APIUtils.getHackerNewsSubmittedContent(user,format,self.request.url, referer, self.request.remote_addr)
+		returnData = APIContent.getHackerNewsSubmittedContent(user,format,self.request.url, referer, self.request.remote_addr)
 			
 		#track this request
 		GAHelper.trackGARequests('/submitted/%s' % (user), self.request.remote_addr, referer)

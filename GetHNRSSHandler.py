@@ -17,7 +17,7 @@ import AppConfig
 import Formatter
 import GAHelper
 from xml.sax.saxutils import escape
-import APIUtils
+import APIContent
 
 class HackerNewsRSSHandler(webapp.RequestHandler):
 	#controller main entry		
@@ -26,7 +26,7 @@ class HackerNewsRSSHandler(webapp.RequestHandler):
 		self.response.headers['Content-Type'] = Formatter.contentType(format)
 		
 		returnData = MutableString()
-		returnData = APIUtils.getHackerNewsRSS(format)
+		returnData = APIContent.getHackerNewsRSS(format)
 		
 		referer = ''
 		if ('HTTP_REFERER' in os.environ):
