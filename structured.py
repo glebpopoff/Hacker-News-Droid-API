@@ -290,13 +290,14 @@ def dict2et(xmldict, roottag='data', listnames=None):
     return root
 
 
-def list2et(xmllist, root, elementname):
+def list2et(xmllist, root, elementname, listnames={}):
     """Converts a list to an Elementtree.
 
         See also dict2et()
     """
 
-    basexml = dict2et({root: xmllist}, 'xml', listnames={root: elementname})
+    listnames[root] = elementname
+    basexml = dict2et({root: xmllist}, 'xml', listnames)
     return basexml.find(root)
 
 
@@ -311,12 +312,12 @@ def dict2xml(datadict, roottag='data', listnames=None, pretty=False):
     return ET.tostring(tree, 'utf-8')
 
 
-def list2xml(datalist, root, elementname, pretty=False):
+def list2xml(datalist, root, elementname, listnames=None, pretty=False):
     """Converts a list to an UTF-8 encoded XML string.
 
     See also dict2et()
     """
-    tree = list2et(datalist, root, elementname)
+    tree = list2et(datalist, root, elementname, listnames)
     if pretty:
         indent(tree)
     return ET.tostring(tree, 'utf-8')
