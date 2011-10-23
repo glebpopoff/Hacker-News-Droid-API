@@ -18,6 +18,11 @@
 			window.location = apiURL + '/news';
 		}
 		
+		function getNewsSimple2()
+		{
+			window.location = apiURL + '/news2';
+		}
+		
 		function getNewestSimple()
 		{
 			window.location = apiURL + '/newest';
@@ -95,7 +100,10 @@
 	<div id="main-container"> 
 		<div id="app-header"> 
 			<h3>Last updated: {{last_updated}}</h3>
-			<span>The API is currently in beta and was developed for the <a href="https://market.android.com/details?id=com.glebpopov.hackernews" target="_new">Hacker News Droid</a> app. The API is built in Python and hosted on AppEngine. I used the <a href="http://www.crummy.com/software/BeautifulSoup/">Beautiful Soup</a> library for HTML parsing/scraping.
+			<p>
+			Update (10/22/11): <i>Thanks to my friend Eric I now have a dedicated server to handle API traffic. The API has been down for a few hours on Friday, October 21st because of GAE urlfetch (DownloadError: ApplicationError: 2) errors. Apparently, GAE started to deny requests to HN so the data had to be retrieved from another server. The API still runs on GAE but the data is being fetched from another server and then provided to GAE instances for processing.  </i>
+			</p>
+			<span>The API is currently in beta and was developed for the <a href="https://market.android.com/details?id=com.glebpopov.hackernews" target="_new">Hacker News Droid</a> app. The API is built in Python and hosted on AppEngine. I used the <a href="http://www.crummy.com/software/BeautifulSoup/">Beautiful Soup</a> library for HTML parsing/scraping and an external dedicated box (generously provided by <script>var user='kigath'; document.writeln('<a href="mailto:' + user + 'i' + '@' + 'g' + 'mai' + 'l.com">' + 'Eric Kigathi</a>')</script>) to retrieve content from HN so it can be processed by GAE instances and served up.
 				<br/>
 				<br/>
 			 There's five minute caching for main content entry points (/news, /best, /ask, /newest); there's no caching for paginated content (requests that require pageID).
@@ -109,6 +117,7 @@
 <b>API Index</b>:
 <ul>
 	<li><a href='#homepage'>Homepage</a></li>
+	<li><a href='#homepage2'>Homepage Page 2</a></li>
 	<li><a href='#latest'>Latest</a></li>
 	<li><a href='#newest'>Newest</a></li>
 	<li><a href='#best'>Best</a></li>
@@ -133,6 +142,21 @@
         </table> 
         <br /> 
 </fieldset> 
+<a name="homepage2"></a>
+<h2>Homepage (Second Page): Simple API</h2> 
+<fieldset> 
+		<b>Returns homepage news, including author, points, number of comments, etc </b>&nbsp;<small>(JSON)</small><br /><br /> 
+        <table> 
+        <tr> 
+         <td>URL:</td> 
+         <td>http://hndroidapi.appspot.com/news2</td> 
+        </tr> 
+        <tr> 
+        <td colspan='2'><input type="button" value=" Test " onclick="getNewsSimple2()" /></td> 
+        </tr> 
+        </table> 
+        <br /> 
+</fieldset>
 
 <h2>Homepage: Advanced API</h2> 
 <fieldset> 

@@ -17,10 +17,11 @@ from GetHNSubmittedHandler import HackerNewsSubmittedHandler
 from GetHNCommentsHandler import HackerNewsCommentsHandler
 from GetHNNestedCommentsHandler import HackerNewsNestedCommentsHandler
 from GetHNLatestHandler import HackerNewsLatestPageHandler
+from SandboxController import HackerNewsSandboxHandler
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
-		template_values = {'last_updated': '10/16/11'}
+		template_values = {'last_updated': '10/22/11'}
 		path = os.path.join(os.path.dirname(__file__), 'templates')
 		path = os.path.join(path, 'index.html')
 		self.response.out.write(template.render(path, template_values))
@@ -30,12 +31,15 @@ def main():
     application = webapp.WSGIApplication([('/', MainHandler),
 										 (r'/rss/format/(json|xml)', HackerNewsRSSHandler),
 										 ('/rss', HackerNewsRSSHandler),
+										 ('/sandbox', HackerNewsSandboxHandler),
 										 ('/latest', HackerNewsLatestPageHandler),
 										 ('/latest/format/(json|xml)/limit/(.*)', HackerNewsLatestPageHandler),
 										 ('/news', HackerNewsPageHandler),
 										 ('/news2', HackerNewsSecondPageHandler),
 										 ('/news/format/(json|xml)', HackerNewsPageHandler),
+										 ('/news2/format/(json|xml)', HackerNewsPageHandler),
 										 (r'/news/format/(json|xml)/page/(.*)', HackerNewsPageHandler),
+										 (r'/news2/format/(json|xml)/page/(.*)', HackerNewsPageHandler),
 										 ('/newest', HackerNewsNewestHandler),
 										 ('/newest/format/(json|xml)', HackerNewsNewestHandler),
 										 (r'/newest/format/(json|xml)/page/(.*)', HackerNewsNewestHandler),
