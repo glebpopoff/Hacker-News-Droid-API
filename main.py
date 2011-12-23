@@ -21,7 +21,7 @@ from SandboxController import HackerNewsSandboxHandler
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
-		template_values = {'last_updated': '10/23/11'}
+		template_values = {'last_updated': '12/23/11'}
 		path = os.path.join(os.path.dirname(__file__), 'templates')
 		path = os.path.join(path, 'index.html')
 		self.response.out.write(template.render(path, template_values))

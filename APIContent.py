@@ -7,15 +7,23 @@ import AppConfig
 #get cached content
 def getCache(pageId,format):
 	logging.debug('getCache: %s' % pageId)
-	dbData = DataCache.getData(pageId,format)
-	if (dbData):
-		if (DataCache.hasExpired(dbData)):
-			#data has expired, remove it
-			dbData[0].delete()
-			return None
-		else:
-			logging.debug('getCache: got cached data for id %s' % id)
-			return dbData[0].rec_xml
+	try:
+		dbData = DataCache.getData(pageId,format)
+		if (dbData):
+			if (DataCache.hasExpired(dbData)):
+				#data has expired, remove it
+				try:
+					dbData[0].delete()
+					return None
+				except:
+					logging.error('getCache: unable to remove cache')
+					return None
+			else:
+				logging.debug('getCache: got cached data for id %s' % id)
+				return dbData[0].rec_xml
+	except:
+		logging.error('getCache: unable to get/retrieve cache')
+		return None
 
 #parse HN's submissions by user
 def getHackerNewsSubmittedContent(user, format='json', url='', referer='', remote_addr=''):
@@ -23,6 +31,7 @@ def getHackerNewsSubmittedContent(user, format='json', url='', referer='', remot
 	apiURL = "%s/submitted?id=%s" % (AppConfig.hackerNewsURL, user)
 	apiURLBackup = "%s/submitted?id=%s" % (AppConfig.hackerNewsURLBackup, user)
 	id = '/submitted/%s' % (user)
+	cachedData = None
 	cachedData = getCache(id,format)
 	if (cachedData):
 		return cachedData
@@ -65,14 +74,18 @@ def getHackerNewsNestedComments(articleId, format='json', url='', referer='', re
 	if (cachedData):
 		return cachedData
 	else:
-		hnData = APIUtils.parseNestedCommentsContent(apiURL, apiURLBackup, '/nestedcomments', None,format)
-		if (hnData):
-			logging.debug('getHackerNewsComments: storing cached value for id %s' % id)
-			DataCache.putData(id, format,APIUtils.removeNonAscii(hnData), url, referer, remote_addr)
-			return hnData
-		else:
-			logging.warning('getHackerNewsComments: unable to retrieve data for id %s' % id)
-			return ''	
+		try:
+			hnData = APIUtils.parseNestedCommentsContent(apiURL, apiURLBackup, '/nestedcomments', None,format)
+			if (hnData):
+				logging.debug('getHackerNewsComments: storing cached value for id %s' % id)
+				DataCache.putData(id, format,APIUtils.removeNonAscii(hnData), url, referer, remote_addr)
+				return hnData
+			else:
+				logging.warning('getHackerNewsComments: unable to retrieve data for id %s' % id)
+				return ''
+		except:
+			logging.warning('getHackerNewsComments: error(s) getting comments %s' % id)
+			return ''
 
 def getHackerNewsSimpleContent(fetcherURL, fetcherBackupURL, id, page='', format='json', url='', referer='', remote_addr=''):
 	#don't cache paginated content

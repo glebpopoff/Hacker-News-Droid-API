@@ -340,7 +340,9 @@ def parseNestedCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format=
 			commentTd = node.first('td', {'class' : 'default'})
 			if (commentTd):
 				previousTds = commentTd.fetchPreviousSiblings('td')
-				nestLevel = int(previousTds[-1].first('img')['width'])/40
+				nestLevel = 0
+				if (previousTds[-1].first('img')['width']):
+					nestLevel = int(previousTds[-1].first('img')['width'])/40
 
 				authorSpan = commentTd.first('span', {'class' : 'comhead'})
 				#multi-paragraph comments are a bit tricky, parser wont' retrieve them using "span class:comment" selector

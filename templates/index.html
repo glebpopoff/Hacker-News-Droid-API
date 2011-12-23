@@ -106,6 +106,8 @@
 		<div id="app-header"> 
 			<h3>Last updated: {{last_updated}}</h3>
 			<p>
+				<small>Update (12/23/11): Reached AppEngine Quotas (DataStore DELETE) so had to enable billing for the app and modify API calls to handle errors better. The API and app are fully functional now.</small>
+			<br/>
 				<small>Update (10/23/11): The API now supports nested comments as a new API call (/nestedcomments) (thanks to Suan Aik Yeo). The old comments API (/comments) has been deprecated.</small>
 			<br/>
 			<small>Update (10/22/11): Thanks to my friend Eric I now have a dedicated server to handle API traffic. The API has been down for a few hours on Friday, October 21st because of GAE urlfetch (DownloadError: ApplicationError: 2) errors. Apparently, GAE started to deny requests to HN so the data had to be retrieved from another server. The API still runs on GAE but the data is being fetched from another server and then provided to GAE instances for processing.  </small>

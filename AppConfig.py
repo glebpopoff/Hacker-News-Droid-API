@@ -17,7 +17,6 @@ hackerNewsNewestURLBackup = 'http://tinyurl.com/3ouh6ml'#http://news.ycombinator
 hackerNewsBestURLBackup = 'http://tinyurl.com/68y3nzx'#http://news.ycombinator.org/best
 hackerNewsAskURLBackup = 'http://tinyurl.com/3lduuz8'#http://news.ycombinator.org/ask
 
-
 #other settings
 hackerNewsRSSFeed = 'http://tinyurl.com/6y37ehb'#http://news.ycombinator.com/rss
 googleAnalyticsKey = 'UA-24252811-3'
