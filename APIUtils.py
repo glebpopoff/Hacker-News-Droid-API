@@ -24,7 +24,7 @@ def removeNonAscii(s): return "" . join(filter(lambda x: ord(x)<128, s))
 #call urlfetch to get remote data
 def fetchRemoteData(urlStr, deadline):
 	result = urlfetch.fetch(url=urlStr, deadline=deadline)
-	if result.status_code == 200:
+	if result.status_code == 200 and result and result.content:
 		return result
 	else:
 		logging.error('fetchRemoteData: unable to get remote data: %s' % urlStr)
@@ -289,7 +289,7 @@ def parseCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format='json'
 						commentsString = re.sub("\r", "", commentsString)
 
 					if (len(commentsString) > 0):
-						commentsString = Formatter.data(format, 'comment', escape(removeNonAscii(commentsString)))[:-1]
+						commentsString = Formatter.data(format, 'comment', escape(removeNonAscii(commentsString)))
 					else:
 						commentsString = "n/a "
 				else:
@@ -401,7 +401,7 @@ def parseNestedCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format=
 						commentsString = re.sub("\r", "", commentsString)
 
 					if (len(commentsString) > 0):
-						commentsString = escape(removeNonAscii(commentsString))[:-1]
+						commentsString = escape(removeNonAscii(commentsString))
 					else:
 						commentsString = "n/a "
 				else:

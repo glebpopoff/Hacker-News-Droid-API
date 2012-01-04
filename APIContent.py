@@ -70,6 +70,7 @@ def getHackerNewsNestedComments(articleId, format='json', url='', referer='', re
 	apiURL = "%s/item?id=%s" % (AppConfig.hackerNewsURL, articleId)
 	apiURLBackup = "%s/item?id=%s" % (AppConfig.hackerNewsURLBackup, articleId)
 	id = '/nestedcomments/%s' % (articleId)
+	#cache data
 	cachedData = getCache(id,format)
 	if (cachedData):
 		return cachedData
