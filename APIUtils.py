@@ -346,11 +346,12 @@ def parseNestedCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format=
 
 				authorSpan = commentTd.first('span', {'class' : 'comhead'})
 				#multi-paragraph comments are a bit tricky, parser wont' retrieve them using "span class:comment" selector
-				commentSpan = getParagraphCommentSiblings(commentTd.first('span', {'class' : 'comment'}))
+				commentSpan = commentTd.first('span', {'class' : 'comment'})
+				commentText = getParagraphCommentSiblings(commentSpan)
 				replyLink = commentTd.first('a', {'href' : re.compile('^reply.*')})['href']
 				if (replyLink and "reply?id=" in replyLink):
 					replyLink = replyLink.replace('reply?id=', '')
-				if (authorSpan and commentSpan):
+				if (authorSpan and commentText):
 					#author span: <span class="comhead"><a href="user?id=dendory">dendory</a> 1 day ago  | <a href="item?id=3015166">link</a></span>
 					commentId = authorSpan.first('a', {'href' : re.compile('^item.*')})
 					user = authorSpan.first('a', {'href' : re.compile('^user.*')})
@@ -361,15 +362,25 @@ def parseNestedCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format=
 					if (commentId['href'] and "item?id=" in commentId['href']):
 						commentId = commentId['href'].replace('item?id=', '')
 					#cleanup
-					commentString = removeHtmlTags(str(commentSpan))
+					commentString = removeHtmlTags(str(commentText))
 					if ('__BR__reply' in commentString):
 						commentString = commentString.replace('__BR__reply', '')
+
+					# Determine if comment is being "grayed out" due to downvotes
+					grayedOutPercent = 0
+					commentFont = commentSpan.first('font')
+					if(commentFont and commentFont['color'] != '#000000'):
+						fontBrightness = int(commentFont['color'][1:3], 16)
+						grayedOutPercent = int(fontBrightness /
+							float(AppConfig.hackerNewsBgroundBrightness) * 100)
+
 					comment_container[counter] =	[
 														commentId,
 														user.string,
 														timePosted.strip(),
 														commentString,
 														replyLink,
+														grayedOutPercent,
 														nestLevel
 													]
 					counter = counter + 1
@@ -389,7 +400,8 @@ def parseNestedCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format=
 				whenPosted = listCommentData[2]
 				commentsString = listCommentData[3]
 				replyId = listCommentData[4]
-				nestLevel = listCommentData[5]
+				grayedOutPercent = listCommentData[5]
+				nestLevel = listCommentData[6]
 				
 				if (format == 'json'):
 
@@ -431,6 +443,8 @@ def parseNestedCommentsContent(hnAPIUrl, hnAPIUrlBackup, apiURL, page='',format=
 
 					if (len(commentsString) > 0 ):
 						comment['comment'] = commentsString
+
+					comment['grayedOutPercent'] = grayedOutPercent
 
 					if nestLevel == 0:
 						comments.append(comment)

@@ -19,5 +19,7 @@ hackerNewsAskURLBackup = 'http://tinyurl.com/3lduuz8'#http://news.ycombinator.or
 
 #other settings
 hackerNewsRSSFeed = 'http://tinyurl.com/6y37ehb'#http://news.ycombinator.com/rss
+hackerNewsBgroundBrightness = 0xf6	# HN pages' background color "R" value
+									# (out of "RGB")
 googleAnalyticsKey = 'UA-24252811-3'
 dataExpirationPolicy = '180'#in seconds
