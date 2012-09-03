@@ -5,39 +5,30 @@
 #
 
 import os
-import re
-import logging
-from UserString import MutableString
-from django.utils import simplejson
-from google.appengine.ext import webapp 
-from google.appengine.ext import db
-from google.appengine.ext.webapp import util
+from google.appengine.ext import webapp
 import Formatter
-import AppConfig
 import GAHelper
-from xml.sax.saxutils import escape
 import APIContent
-import GAHelper
-from BeautifulSoup import BeautifulSoup
+
 
 class HackerNewsAskHandler(webapp.RequestHandler):
-	
-	#controller main entry		
-	def get(self,format='json',page=''):
-		#set content-type
-		self.response.headers['Content-Type'] = Formatter.contentType(format)
-		
-		referer = ''
-		if ('HTTP_REFERER' in os.environ):
-			referer = os.environ['HTTP_REFERER']
-		
-		returnData = APIContent.getHackerNewsAskContent(page,format,self.request.url, referer, self.request.remote_addr)
-		if (not returnData or returnData == None or returnData == '' or returnData == 'None'):
-			#call the service again this time without the pageID
-			returnData = APIContent.getHackerNewsAskContent('',format,self.request.url, referer, self.request.remote_addr)
-					
-		#track this request
-		GAHelper.trackGARequests('/ask', self.request.remote_addr, referer)
-		
-		#output to the browser
-		self.response.out.write(Formatter.dataWrapper(format, returnData))
+
+    #controller main entry
+    def get(self, format='json', page=''):
+        #set content-type
+        self.response.headers['Content-Type'] = Formatter.contentType(format)
+
+        referer = ''
+        if ('HTTP_REFERER' in os.environ):
+            referer = os.environ['HTTP_REFERER']
+
+        returnData = APIContent.getHackerNewsAskContent(page, format, self.request.url, referer, self.request.remote_addr)
+        if (not returnData or returnData == None or returnData == '' or returnData == 'None'):
+            #call the service again this time without the pageID
+            returnData = APIContent.getHackerNewsAskContent('', format, self.request.url, referer, self.request.remote_addr)
+
+        #track this request
+        GAHelper.trackGARequests('/ask', self.request.remote_addr, referer)
+
+        #output to the browser
+        self.response.out.write(Formatter.dataWrapper(format, returnData, self.request.get('callback')))
