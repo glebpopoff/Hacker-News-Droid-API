@@ -25,6 +25,24 @@ def getCache(pageId, format):
         logging.error('getCache: unable to get/retrieve cache')
         return None
 
+#get post by id
+def getHackerNewsPost(articleId, format='json', url='', referer='', remote_addr=''):
+    #only cache homepage data
+    apiURL = "%s/item?id=%s" % (AppConfig.hackerNewsURL, articleId)
+    apiURLBackup = "%s/item?id=%s" % (AppConfig.hackerNewsURLBackup, articleId)
+    id = '/post/%s' % (articleId)
+    cachedData = getCache(id,format)
+    if (cachedData):
+        return cachedData
+    else:
+        hnData = APIUtils.parsePostContent(apiURL, apiURLBackup, '/post', None,format)
+        if (hnData):
+            logging.debug('getHackerNewsPost: storing cached value for id %s' % id)
+            DataCache.putData(id, format,APIUtils.removeNonAscii(hnData), url, referer, remote_addr)
+            return hnData
+        else:
+            logging.warning('getHackerNewsPost: unable to retrieve data for id %s' % id)
+            return ''
 
 #parse HN's submissions by user
 def getHackerNewsSubmittedContent(user, format='json', url='', referer='', remote_addr=''):

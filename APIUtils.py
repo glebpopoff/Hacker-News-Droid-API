@@ -56,6 +56,179 @@ def getRemoteData(urlStr, backupUrl):
 					return None
 	return None
 
+#parse post data 
+def parsePostContent(hnAPIUrl,hnBackupAPIUrl, apiURL, page='',format='json',limit=0):
+	returnData = MutableString()
+	returnData = ''
+	logging.debug('HN URL: %s' % hnAPIUrl)
+	
+	#next page content (not allowed - robots.txt Disallow)
+	#if (page):
+	#	hnAPIUrl = '%s/x?fnid=%s' % (AppConfig.hackerNewsURL, page)
+	
+	#call HN website to get data
+	httpData = getRemoteData(hnAPIUrl)
+	if (httpData):
+		htmlData = httpData
+		#php parser (primary API)
+		if ('{"title":"' in htmlData and 'HNDroidAPI PHP Parser' in htmlData):
+			return htmlData
+
+		#classic API fallback
+		soup = BeautifulSoup(htmlData)
+		urlLinksContent = soup('td', {'class' : 'title'})
+		counter = 0
+		url_links = {}
+		for node in urlLinksContent:
+			if (node.a):
+				url_links[counter] = [node.a['href'], node.a.string]
+				counter = counter + 1
+				if (limit > 0 and counter == limit):
+					break;
+		
+		#get comments & the rest
+		commentsContent = soup('td', {'class' : 'subtext'})
+		counter = 0
+		comments_stuff = {}
+		for node in commentsContent:
+			if (node):
+				#parsing this
+				#<td class="subtext"><span id="score_3002117">110 points</span> by <a href="user?id=JoelSutherland">JoelSutherland</a> 3 hours ago  | <a href="item?id=3002117">36 comments</a></td>
+				nodeString = removeHtmlTags(str(node))
+				score = node.first('span', {'id' : re.compile('^score.*')}).string
+				user = node.first('a', {'href' : re.compile('^user.*')}).string
+				itemId = node.first('a', {'href' : re.compile('^item.*')})["href"]
+				comments = node.first('a', {'href' : re.compile('^item.*')}).string
+				#since 'XX hours ago' string isn't part of any element we need to simply search and replace other text to get it
+				timeAgo = nodeString.replace(str(score), '')
+				timeAgo = timeAgo.replace('by %s' % str(user), '')
+				timeAgo = timeAgo.replace(str(comments), '')
+				timeAgo = timeAgo.replace('|', '')
+				comments_stuff[counter] = [score, user, comments, timeAgo.strip(), itemId, nodeString]
+				counter = counter + 1
+				if (limit > 0 and counter == limit):
+					break;
+		
+		#build up string		
+		for key in url_links.keys():
+			tupURL = url_links[key]
+			if (key in comments_stuff):
+				tupComments = comments_stuff[key]
+			else:
+				tupComments = None
+			if (tupURL):
+				url = ''
+				title = ''
+				score = ''
+				user = ''
+				comments = ''
+				timeAgo = ''
+				itemId = ''
+				itemInfo = ''
+				
+				#assign vars
+				url = tupURL[0]
+				title = tupURL[1]
+				if (title):
+					title = title.decode("string-escape")
+				
+				if (tupComments):
+					score = tupComments[0]
+					if (score):
+						score = score.decode("string-escape")
+					user = tupComments[1]
+					if (user):
+						user = user.decode("string-escape")
+					comments = tupComments[2]
+					if (comments):
+						comments = comments.decode("string-escape")
+					timeAgo = tupComments[3]
+					if (timeAgo):
+						timeAgo = timeAgo.decode("string-escape")
+					itemId = tupComments[4]
+					if (itemId):
+						itemId = itemId.decode("string-escape")
+					itemInfo = tupComments[5]
+					if (itemInfo):
+						itemInfo = itemInfo.decode("string-escape")
+				else:
+					#need this for formatting
+					itemInfo = 'n/a '
+				
+				#last record (either news2 or x?fnid)
+				if (title.lower() == 'more' or '/x?fnid' in url):
+					title = 'NextId'
+					if ('/x?fnid' in url):
+						url = '%s/format/%s/page/%s' % (apiURL, format, url.replace('/x?fnid=', ''))
+					else:
+						url = '/news2'
+					itemInfo = 'hn next id %s ' % tupURL[0]
+				
+				if (format == 'json'):
+					startTag = '{'
+					endTag = '},'
+					
+					#cleanup
+					if (title):
+						title = re.sub("\n", "", title)
+						title = re.sub("\"", "\\\"", title)
+						#title = re.sub("&euro;", "", title)
+					
+					if (itemInfo):
+						itemInfo = re.sub("\"", "\\\"", itemInfo)
+						itemInfo = re.sub("\n", "", itemInfo)
+						itemInfo = re.sub("\t", " ", itemInfo)
+						itemInfo = re.sub("\r", "", itemInfo)
+						#itemInfo = re.sub("&euro;", "", itemInfo)
+
+					if (len(itemInfo) > 0):
+						itemInfo = Formatter.data(format, 'description', escape(itemInfo))[:-1]
+				else:
+					startTag = '<record>'
+					endTag = '</record>'
+					if (len(title) > 0):
+						title = escape(removeNonAscii(title))
+						
+					if (len(url) > 0):
+						url = escape(url)
+					
+					if (len(user) > 0):
+						user = escape(user)
+						
+					if (len(itemInfo) > 0):
+						itemInfo = Formatter.data(format, 'description', escape(itemInfo))								
+
+				if (len(title) > 0):
+					returnData += startTag + Formatter.data(format, 'title', title)
+
+				if (len(url) > 0):
+					returnData += Formatter.data(format, 'url', url) 
+
+				if (len(score) > 0):
+					returnData += Formatter.data(format, 'score', score)
+					
+				if (len(user) > 0):
+					returnData += Formatter.data(format, 'user', user)
+				
+				if (len(comments) > 0):
+					returnData += Formatter.data(format, 'comments', comments)
+
+				if (len(timeAgo) > 0):
+					returnData += Formatter.data(format, 'time', timeAgo)
+					
+				if (len(itemId) > 0):
+					#cleanup
+					if ('item?id=' in itemId):
+						itemId = itemId.replace('item?id=', '')
+					returnData += Formatter.data(format, 'item_id', itemId)
+
+				if (len(itemInfo) > 0 ):
+					returnData += itemInfo + endTag
+	else:
+		returnData = None
+	
+	return returnData
+
 #parse content using Beautiful Soup
 def parsePageContent(hnAPIUrl,hnBackupAPIUrl, apiURL, page='',format='json',limit=0):
 	returnData = MutableString()

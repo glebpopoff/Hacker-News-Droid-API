@@ -21,6 +21,6 @@ hackerNewsAskURLBackup = 'http://tinyurl.com/3lduuz8'  # http://news.ycombinator
 hackerNewsRSSFeed = 'http://tinyurl.com/6y37ehb'  # http://news.ycombinator.com/rss
 hackerNewsBgroundBrightness = 0xf6	 # HN pages' background color "R" value (out of "RGB")
 
-googleAnalyticsKey = 'UA-24252811-3'  # UA-24252811-3
+googleAnalyticsKey = 'XYZ'  # your GA code
 dataExpirationPolicy = '180'  # in seconds
 appDomain = 'hndroidapi.appspot.com'  # hndroidapi.appspot.com
